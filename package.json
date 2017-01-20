@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electro index.js"
+    "start": "xvfb-maybe electro index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "electro": "^2.0.3",
     "electron": "^1.4.15",
-    "opc": "^1.1.2"
+    "opc": "^1.1.2",
+    "xvfb-maybe": "^0.1.3"
   }
 }
