@@ -32,12 +32,12 @@ var noteEnd = noteStart + 12 * 4
 for (var i = 0; i < lanternCount; i++) {
   lanterns[i] = []
   lanternOutputs[i] = [0, 0, 0]
-  var element = document.createElement('div')
-  elements[i] = element
-  element.style.height = '100px'
-  element.style.width = '100px'
-  element.style.float = 'left'
-  document.body.appendChild(element)
+  // var element = document.createElement('div')
+  // elements[i] = element
+  // element.style.height = '100px'
+  // element.style.width = '100px'
+  // element.style.float = 'left'
+  // document.body.appendChild(element)
 }
 
 setInterval(tick, 1000 / 60)
@@ -63,7 +63,7 @@ function refreshOutput () {
   for (var i = 0; i < lanternCount; i++) {
     var color = lanternOutputs[i]
     updateLanternColor(lanterns[i], color, i)
-    elements[i].style.backgroundColor = cssColor(color)
+    // elements[i].style.backgroundColor = cssColor(color)
   }
   send(lanternOutputs)
 }
