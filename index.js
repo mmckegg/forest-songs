@@ -27,7 +27,7 @@ var lanternCount = 8
 var noteStart = 50
 var frameBlend = 0.1
 var tuning = 440
-var noteEnd = noteStart + 12 * 3
+var noteEnd = noteStart + 12 * 4
 
 for (var i = 0; i < lanternCount; i++) {
   lanterns[i] = []
