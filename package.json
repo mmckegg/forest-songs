@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "electro": "^2.0.3",
-    "electron": "^1.4.15"
+    "electron": "^1.4.15",
+    "opc": "^1.1.2"
   }
 }

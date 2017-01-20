@@ -1,5 +1,13 @@
 var audioContext = new global.AudioContext()
 var hslToRgb = require('./lib/hsl-to-rgb')
+var connect = require('./lib/opc-output')
+
+var send = connect({
+  port: 7890,
+  host: 'localhost',
+  repeat: 8 * 8,
+  length: 1
+})
 
 navigator.getUserMedia({
   audio: true
@@ -55,9 +63,9 @@ function refreshOutput () {
   for (var i = 0; i < lanternCount; i++) {
     var color = lanternOutputs[i]
     updateLanternColor(lanterns[i], color, i)
-    //color[0] = lanterns[i][0]
     elements[i].style.backgroundColor = cssColor(color)
   }
+  send(lanternOutputs)
 }
 
 function cssColor (rgb) {
@@ -72,10 +80,9 @@ function updateLanternColor (layers, target, root) {
   target[0] = target[0] * frameBlend
   target[1] = target[1] * frameBlend
   target[2] = target[2] * frameBlend
-  layers.forEach((layer, i) => {
-    var hue = (i % 8) / 8
+  layers.forEach((layer, id) => {
+    var hue = (id % 8) / 8
     var color = hslToRgb(hue, 1, layer / 255)
-    //console.log(color)
     for (var i = 0; i < 3; i++) {
       target[i] = (target[i] || 0) + (color[i] || 0)
     }
