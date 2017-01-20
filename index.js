@@ -6,7 +6,7 @@ var send = connect({
   port: 7890,
   host: 'localhost',
   repeat: 8 * 8,
-  length: 1
+  length: 7
 })
 
 navigator.getUserMedia({
@@ -15,29 +15,31 @@ navigator.getUserMedia({
 
 var analyser = audioContext.createAnalyser()
 analyser.fftSize = 4096 * 2
-analyser.smoothingTimeConstant = 0.95
-analyser.maxDecibels = -20
+analyser.smoothingTimeConstant = 0.8
+analyser.maxDecibels = -10
 analyser.minDecibels = -50
 var bins = new Uint8Array(analyser.frequencyBinCount)
 
 var lanterns = []
 var elements = []
 var lanternOutputs = []
-var lanternCount = 8
+var lanternCount = 7
+
+var frameBlend = 0.98
+
+var tuning = 440 // middle a
 var noteStart = 50
-var frameBlend = 0.1
-var tuning = 440
-var noteEnd = noteStart + 12 * 4
+var noteEnd = noteStart + 12 * 6
 
 for (var i = 0; i < lanternCount; i++) {
   lanterns[i] = []
   lanternOutputs[i] = [0, 0, 0]
-  // var element = document.createElement('div')
-  // elements[i] = element
-  // element.style.height = '100px'
-  // element.style.width = '100px'
-  // element.style.float = 'left'
-  // document.body.appendChild(element)
+  var element = document.createElement('div')
+  elements[i] = element
+  element.style.height = '100px'
+  element.style.width = '100px'
+  element.style.float = 'left'
+  document.body.appendChild(element)
 }
 
 setInterval(tick, 1000 / 60)
@@ -50,7 +52,7 @@ function start (stream) {
 function tick () {
   analyser.getByteFrequencyData(bins)
 
-  for (var i = noteStart; i < noteEnd; i++) {
+  for (var i = noteStart; i < noteEnd; i += 2) {
     var layerId = Math.floor((i - noteStart) / lanternCount)
     var lanternId = i % lanternCount
     lanterns[lanternId][layerId] = getNoteAmp(i)
@@ -63,7 +65,7 @@ function refreshOutput () {
   for (var i = 0; i < lanternCount; i++) {
     var color = lanternOutputs[i]
     updateLanternColor(lanterns[i], color, i)
-    // elements[i].style.backgroundColor = cssColor(color)
+    elements[i].style.backgroundColor = cssColor(color)
   }
   send(lanternOutputs)
 }
@@ -77,16 +79,18 @@ function norm (byte) {
 }
 
 function updateLanternColor (layers, target, root) {
-  target[0] = target[0] * frameBlend
-  target[1] = target[1] * frameBlend
-  target[2] = target[2] * frameBlend
+  var frameColor = [0, 0, 0]
   layers.forEach((layer, id) => {
     var hue = (id % 8) / 8
     var color = hslToRgb(hue, 1, layer / 255)
     for (var i = 0; i < 3; i++) {
-      target[i] = (target[i] || 0) + (color[i] || 0)
+      frameColor[i] = (frameColor[i] || 0) + (color[i] || 0)
     }
   })
+
+  target[0] = Math.max(target[0] * frameBlend, frameColor[0])
+  target[1] = Math.max(target[1] * frameBlend, frameColor[1])
+  target[2] = Math.max(target[2] * frameBlend, frameColor[2])
 }
 
 function average (array, from, to) {
